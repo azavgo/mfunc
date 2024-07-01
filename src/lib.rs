@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::{Write, Error};
+
 //Standard factorial function n!
 pub fn factorial(n: usize) -> usize {
     match n {
@@ -42,6 +45,7 @@ pub fn parity(n: usize) -> f64 {
 
 //Dirichlet beta function at x, where upper is the upper limit 
 //of the summation 
+//https://en.wikipedia.org/wiki/Dirichlet_beta_function 
 pub fn dirichlet_beta(x: f64, upper: usize) -> f64 {
     let mut y: f64 = 0.0;  
     for n in 0..=upper {
@@ -50,9 +54,38 @@ pub fn dirichlet_beta(x: f64, upper: usize) -> f64 {
     y
 }
 
+//Function that creates a csv text file, opens it to write the 
+//output of a calculation in the form x, y
+//This file then should be readable by gnuplot for plotting
+pub fn output(v: Vec<(f64, f64)>) -> Vec<String>{
+    let mut out: Vec<String> = Vec::new(); 
+    for e in v {
+        out.push(format!("{:.2}, {:.2}", e.0, e.1));
+    }
+    out
+}
+
+pub fn file_output(out: &Vec<String>) -> Result<(), Error> {
+    let path = "data.csv"; 
+    let mut output = File::create(path)?;
+    write!(output, "{}", out.join("\n"))?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_output_01() {
+        let mut v: Vec<(f64, f64)> = Vec::new();
+        v.push((2.0, 1.0)); 
+        v.push((0.0, -3.0));
+        let out = output(v);
+        file_output(&out).unwrap();
+        assert_eq!("2.00, 1.00".to_string(), out[0]);
+        assert_eq!("0.00, -3.00".to_string(), out[1]);
+    }
 
     #[test]
     fn test_dirichlet_beta_01() {
