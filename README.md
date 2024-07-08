@@ -1,6 +1,6 @@
 ## Library of some math functions 
 
-### Features: 
+### List of functions: 
 1. Function to output the calculation results as Vec<String>: pub fn output(v: Vec<(f64, f64)>) -> Vec<String>;
 1. Function to record the calculation results to data.csv: pub fn file_output(out: &Vec<String>) -> Result<(), MfuncError> ; 
 1. Dirichlet beta function: pub fn dirichlet_beta(x: f64, upper: usize) -> f64;
@@ -16,9 +16,20 @@
 ```
 2. Calculate Dirichlet beta function at 1.0, 2.0, and 3.0:  
 ```Rust
-    use mfunc::MfuncError;
+use mfunc::{dirichlet_beta, file_output, output, MfuncError};
 
     fn main() -> Result<(), MfuncError>{ 
+        let mut result: Vec<(f64, f64)> = Vec::new();
+        let upper: usize = 200000;
+        let x_range = [1.0, 2.0, 3.0]; 
+
+        for x in x_range {
+            result.push((x, dirichlet_beta(x, upper)));    
+        }
+
+        let out = output(result); 
+        file_output(&out)?; 
+
         Ok(())
     }
   
